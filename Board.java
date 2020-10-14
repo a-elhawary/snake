@@ -1,17 +1,16 @@
 import javax.swing.JPanel;
 import java.util.ArrayList;
 import java.awt.Graphics;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
 
 // a board is a grid of tiles
-public class Board extends JPanel implements KeyListener{
+public class Board extends JPanel{
     static final int TILE_SIZE = 20;
     static final int TILE_COUNT_X = Game.WIDTH / TILE_SIZE;
     static final int TILE_COUNT_Y = Game.HEIGHT / TILE_SIZE;
 
     private ArrayList<ArrayList<Tile>> board;
     private Snake snake;
+    private Apple apple;
 
     public Board(){
         board = new ArrayList<ArrayList<Tile>>();
@@ -28,23 +27,32 @@ public class Board extends JPanel implements KeyListener{
         }
         // make snake
         snake = new Snake(10,10);
+        apple = new Apple(3 ,3);
     }
 
-    private void addSnake(){
+    public Snake getSnake(){
+        return snake;
+    }
+
+    private void updateSnake(){
+        for(int i = 0; i < snake.getLength(); i++){
+            SnakePiece currentPiece = snake.getSnakePiece(i);
+            board.get(currentPiece.tileY).get(currentPiece.tileX).setChild(null);
+        }
+        snake.move();
         for(int i = 0; i < snake.getLength(); i++){
             SnakePiece currentPiece = snake.getSnakePiece(i);
             board.get(currentPiece.tileY).get(currentPiece.tileX).setChild(currentPiece);
         }
     }
 
+    private void updateApple(){
+        board.get(apple.tileY).get(apple.tileX).setChild(apple);
+    }
+
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        render(g);
-    }
-    
-    public void render(Graphics g){
-        addSnake();
         for(int i = 0; i < TILE_COUNT_Y; i++){
             ArrayList<Tile> row = board.get(i);
             for(int j = 0; j < TILE_COUNT_X; j++){
@@ -53,10 +61,8 @@ public class Board extends JPanel implements KeyListener{
         }
     }
     
-    public void keyPressed(KeyEvent e){
-        System.out.println(e.getKeyCode());
+    public void update(){
+        updateSnake();
+        updateApple();
     }
-
-    public void keyReleased(KeyEvent e){}
-    public void keyPressed(KeyEvent e){}
 }
